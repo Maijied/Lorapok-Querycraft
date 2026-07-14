@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lorapok Querycraft â€” UI Design</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@700;900&family=Space+Mono:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#030711;
+    --surface:#0a1120;
+    --surface-2:#0d1626;
+    --surface-3:#111d33;
+    --line:rgba(255,255,255,0.08);
+    --line-cyan:rgba(0,212,255,0.18);
+    --green:#00ff88;
+    --cyan:#00d4ff;
+    --gold:#d4a843;
+    --danger:#ff4d6d;
+    --text:#e8ecf1;
+    --muted:#7c8798;
+    --muted-2:#4d5666;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(0,212,255,0.05), transparent 45%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,255,136,0.04), transparent 45%),
+      repeating-linear-gradient(125deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px),
+      var(--bg);
+    color:var(--text);
+    font-family:'Lora',serif;
+    padding:48px 32px 96px;
+  }
+  .intro{max-width:1100px;margin:0 auto 56px;}
+  .wordmark{
+    display:flex;align-items:center;gap:14px;margin-bottom:18px;
+  }
+  .wordmark h1{
+    font-family:'Playfair Display SC',serif;
+    font-weight:900;
+    font-size:30px;
+    letter-spacing:0.5px;
+    margin:0;
+    background:linear-gradient(90deg,var(--green),var(--cyan) 60%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .wordmark span{
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:2px;
+    text-transform:uppercase;
+    display:block;
+    margin-top:2px;
+  }
+  .intro p{color:var(--muted);max-width:640px;line-height:1.65;font-size:15px;}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;}
+  .chip{
+    font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);
+    border:1px solid var(--line);border-radius:20px;padding:6px 14px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;}
+
+  .rail{
+    display:flex;gap:36px;overflow-x:auto;padding-bottom:24px;max-width:100%;
+  }
+  .frame-block{flex:0 0 auto;text-align:center;}
+  .frame-label{
+    font-family:'Space Mono',monospace;color:var(--muted);font-size:12px;
+    letter-spacing:1px;margin-bottom:14px;text-transform:uppercase;
+  }
+  .phone{
+    width:320px;height:672px;
+    background:#000;
+    border-radius:38px;
+    padding:12px;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.06), 0 30px 60px -20px rgba(0,0,0,0.8), 0 0 40px -10px rgba(0,212,255,0.08);
+    position:relative;
+  }
+  .screen{
+    width:100%;height:100%;background:var(--surface);
+    border-radius:28px;overflow:hidden;position:relative;
+    display:flex;flex-direction:column;
+  }
+  .notch{
+    position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:120px;height:22px;background:#000;border-radius:0 0 16px 16px;z-index:5;
+  }
+  .statusbar{
+    display:flex;justify-content:space-between;padding:10px 22px 4px;
+    font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);
+  }
+
+  /* header used across screens */
+  .app-header{
+    padding:6px 18px 14px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .app-header .brand{display:flex;align-items:center;gap:8px;}
+  .app-header h2{
+    font-family:'Playfair Display SC',serif;font-size:15px;margin:0;
+    letter-spacing:0.5px;font-weight:700;color:var(--text);
+  }
+  .hex-logo{width:24px;height:24px;flex-shrink:0;}
+
+  .body-scroll{flex:1;overflow-y:auto;padding:14px 16px 90px;}
+
+  /* ---------- Screen 1: Connections ---------- */
+  .conn-card{
+    background:var(--surface-2);border:1px solid var(--line);
+    border-radius:12px;padding:14px 14px 12px;margin-bottom:12px;
+    position:relative;
+  }
+  .conn-card .top{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .conn-card .color-tag{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .conn-card .alias{font-family:'Lora',serif;font-weight:600;font-size:14.5px;flex:1;}
+  .conn-card .host{
+    font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);
+    margin-left:18px;
+  }
+  .pill{
+    font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:0.5px;
+    padding:3px 9px;border-radius:20px;text-transform:uppercase;
+  }
+  .pill.connected{background:rgba(0,255,136,0.12);color:var(--green);border:1px solid rgba(0,255,136,0.3);}
+  .pill.ssh{background:rgba(0,212,255,0.1);color:var(--cyan);border:1px solid rgba(0,212,255,0.28);margin-left:6px;}
+  .section-eyebrow{
+    font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted-2);
+    text-transform:uppercase;letter-spacing:2px;margin:18px 0 10px 2px;
+  }
+  .fab{
+    position:absolute;bottom:20px;right:18px;width:52px;height:52px;
+    background:var(--green);border-radius:16px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 24px -6px rgba(0,255,136,0.45);
+  }
+  .fab span{font-size:26px;color:#02140b;font-weight:700;line-height:1;}
+
+  /* ---------- Screen 2: Data Grid ---------- */
+  .table-tabs{display:flex;gap:8px;overflow-x:auto;margin-bottom:12px;}
+  .tab{
+    font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);
+    padding:6px 12px;border-radius:8px;border:1px solid var(--line);white-space:nowrap;
+  }
+  .tab.active{color:var(--cyan);border-color:var(--line-cyan);background:rgba(0,212,255,0.06);}
+  .filter-bar{
+    display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;
+  }
+  .filter-chip{
+    font-family:'Space Mono',monospace;font-size:10.5px;color:var(--gold);
+    background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.28);
+    padding:5px 10px;border-radius:8px;
+  }
+  .grid{border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+  .grid-row{
+    display:grid;grid-template-columns:0.5fr 1fr 1.1fr 0.8fr;
+    font-family:'Space Mono',monospace;font-size:11px;
+    padding:9px 10px;border-bottom:1px solid var(--line);
+  }
+  .grid-row.head{background:var(--surface-3);color:var(--cyan);font-weight:700;}
+  .grid-row:nth-child(even):not(.head){background:rgba(255,255,255,0.015);}
+  .grid-row div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:4px;}
+  .status-paid{color:var(--green);}
+  .status-pending{color:var(--gold);}
+  .row-actions{display:flex;gap:14px;margin-top:10px;justify-content:flex-end;}
+  .row-actions span{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+
+  /* ---------- Screen 3: Playground ---------- */
+  .ai-toggle{
+    font-family:'Space Mono',monospace;font-size:9.5px;color:var(--green);
+    border:1px solid rgba(0,255,136,0.3);background:rgba(0,255,136,0.08);
+    padding:4px 9px;border-radius:20px;
+  }
+  .editor{
+    background:#050a15;border:1px solid var(--line);border-radius:10px;
+    font-family:'Space Mono',monospace;font-size:12px;line-height:1.9;
+    padding:12px 0;margin-bottom:14px;
+  }
+  .code-line{display:flex;padding:0 10px;}
+  .ln{color:var(--muted-2);width:22px;flex-shrink:0;user-select:none;}
+  .kw{color:var(--cyan);}
+  .str{color:var(--gold);}
+  .fn{color:var(--green);}
+  .cm{color:var(--muted-2);font-style:italic;}
+  .ghost{color:rgba(212,168,67,0.45);}
+  .suggest-box{
+    margin:2px 0 14px 22px;background:var(--surface-3);
+    border:1px solid var(--line-cyan);border-radius:8px;
+    width:200px;overflow:hidden;
+  }
+  .suggest-item{
+    display:flex;align-items:center;gap:7px;padding:6px 10px;
+    font-family:'Space Mono',monospace;font-size:11px;
+  }
+  .suggest-item.sel{background:rgba(0,255,136,0.1);color:var(--green);}
+  .suggest-item .ic{width:14px;text-align:center;color:var(--cyan);font-size:10px;}
+  .divider-drag{
+    height:4px;width:36px;background:var(--muted-2);border-radius:4px;
+    margin:0 auto 10px;
+  }
+  .result-panel{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  }
+  .result-panel .meta{
+    font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px;
+  }
+
+  /* ---------- Screen 4: AI Assistant ---------- */
+  .prompt-bubble{
+    align-self:flex-end;background:var(--surface-3);border:1px solid var(--line);
+    border-radius:14px 14px 3px 14px;padding:10px 14px;font-size:13.5px;
+    max-width:80%;margin-left:auto;margin-bottom:14px;
+  }
+  .ai-card{
+    background:var(--surface-2);border:1px solid var(--line-cyan);border-radius:14px;
+    padding:14px;margin-bottom:14px;
+  }
+  .risk-badge{
+    font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:1px;
+    padding:3px 9px;border-radius:6px;text-transform:uppercase;font-weight:700;
+  }
+  .risk-read{background:rgba(0,255,136,0.12);color:var(--green);}
+  .risk-write{background:rgba(212,168,67,0.14);color:var(--gold);}
+  .risk-destructive{background:rgba(255,77,109,0.14);color:var(--danger);}
+  .ai-card .sql{
+    font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.7;
+    color:var(--text);background:#050a15;border-radius:8px;padding:10px;margin:10px 0;
+    border:1px solid var(--line);
+  }
+  .ai-card .explain{font-size:12.5px;color:var(--muted);line-height:1.6;font-style:italic;}
+  .btn-row{display:flex;gap:8px;margin-top:12px;}
+  .btn{
+    font-family:'Space Mono',monospace;font-size:11px;text-align:center;flex:1;
+    padding:9px 0;border-radius:8px;border:1px solid var(--line);color:var(--muted);
+  }
+  .btn.confirm{background:var(--green);color:#02140b;border:none;font-weight:700;}
+  .ask-input{
+    position:absolute;bottom:14px;left:14px;right:14px;
+    background:var(--surface-3);border:1px solid var(--line-cyan);border-radius:24px;
+    padding:12px 16px;display:flex;align-items:center;gap:10px;
+  }
+  .ask-input input-fake{flex:1;font-family:'Lora',serif;font-size:13px;color:var(--muted);}
+  .hex-send{width:30px;height:30px;flex-shrink:0;}
+
+  /* ---------- Screen 5: AI Providers Settings ---------- */
+  .provider-row{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin-bottom:10px;
+  }
+  .provider-row .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .provider-name{font-family:'Lora',serif;font-weight:600;font-size:13.5px;}
+  .key-field{
+    font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);
+    background:#050a15;border:1px solid var(--line);border-radius:6px;
+    padding:8px 10px;margin-bottom:8px;
+  }
+  .provider-row .actions{display:flex;justify-content:space-between;align-items:center;}
+  .test-btn{
+    font-family:'Space Mono',monospace;font-size:10px;color:var(--cyan);
+    border:1px solid var(--line-cyan);border-radius:6px;padding:5px 10px;
+  }
+  .toggle{
+    width:34px;height:18px;border-radius:20px;position:relative;
+  }
+  .toggle.on{background:rgba(0,255,136,0.25);}
+  .toggle.off{background:rgba(255,255,255,0.08);}
+  .toggle .knob{
+    position:absolute;top:2px;width:14px;height:14px;border-radius:50%;
+  }
+  .toggle.on .knob{background:var(--green);right:2px;}
+  .toggle.off .knob{background:var(--muted-2);left:2px;}
+  .banner{
+    font-family:'Space Mono',monospace;font-size:10.5px;color:var(--gold);
+    background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.25);
+    border-radius:10px;padding:10px 12px;line-height:1.6;margin-bottom:16px;
+  }
+
+  /* ---------- Screen: Add Connection form ---------- */
+  .field-label{
+    font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:1px;margin:14px 0 6px;
+  }
+  .field-input{
+    background:#050a15;border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;font-family:'Space Mono',monospace;font-size:12px;color:var(--text);
+  }
+  .field-input.placeholder{color:var(--muted-2);}
+  .segmented{
+    display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  }
+  .segmented div{
+    flex:1;text-align:center;padding:8px 0;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted);
+  }
+  .segmented div.active{background:rgba(0,212,255,0.1);color:var(--cyan);}
+  .swatch-row{display:flex;gap:10px;margin-top:4px;}
+  .swatch{width:22px;height:22px;border-radius:50%;border:2px solid transparent;}
+  .swatch.sel{border-color:#fff;}
+  .expand-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 2px;border-top:1px solid var(--line);margin-top:8px;
+    font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);
+  }
+  .save-policy{
+    display:flex;gap:6px;margin-top:4px;
+  }
+  .policy-pill{
+    font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);
+    border:1px solid var(--line);border-radius:16px;padding:4px 10px;
+  }
+  .policy-pill.active{color:var(--green);border-color:rgba(0,255,136,0.3);background:rgba(0,255,136,0.08);}
+  .form-actions{display:flex;gap:10px;margin-top:20px;}
+
+  /* ---------- Screen: General Settings ---------- */
+  .settings-group{margin-bottom:6px;}
+  .setting-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 2px;border-bottom:1px solid var(--line);
+  }
+  .setting-row .label{font-family:'Lora',serif;font-size:13px;}
+  .setting-row .sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;}
+  .stepper{
+    display:flex;align-items:center;gap:10px;
+    font-family:'Space Mono',monospace;font-size:13px;color:var(--cyan);
+  }
+  .stepper span.btn-step{
+    width:22px;height:22px;border:1px solid var(--line-cyan);border-radius:6px;
+    text-align:center;line-height:20px;color:var(--cyan);font-size:14px;
+  }
+  .db-check-row{
+    display:flex;align-items:center;gap:10px;padding:9px 2px;
+  }
+  .checkbox{
+    width:16px;height:16px;border-radius:4px;border:1.5px solid var(--muted);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .checkbox.checked{background:var(--green);border-color:var(--green);}
+  .checkbox.checked::after{content:"âœ“";font-size:10px;color:#02140b;font-weight:700;}
+  .db-check-row .name{font-family:'Space Mono',monospace;font-size:12px;flex:1;}
+  .db-check-row .count{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted-2);}
+  .select-all-row{
+    display:flex;justify-content:space-between;font-family:'Space Mono',monospace;
+    font-size:10px;color:var(--cyan);margin:10px 2px 4px;
+  }
+
+  /* ---------- Screen: About ---------- */
+  .about-hero{text-align:center;padding:26px 10px 18px;}
+  .about-hero .hex-big{width:64px;height:64px;margin-bottom:12px;}
+  .about-hero h3{
+    font-family:'Playfair Display SC',serif;font-size:19px;margin:0 0 4px;
+    letter-spacing:0.5px;
+  }
+  .about-hero .ver{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted);}
+  .about-block{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:12px;
+    padding:14px;margin-bottom:12px;
+  }
+  .about-block .k{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted-2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .about-block .v{font-family:'Lora',serif;font-size:13px;line-height:1.6;}
+  .feature-list{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);line-height:2.1;}
+  .feature-list .on{color:var(--green);}
+  .about-links{display:flex;gap:10px;margin-top:6px;}
+  .link-chip{
+    font-family:'Space Mono',monospace;font-size:10px;color:var(--cyan);
+    border:1px solid var(--line-cyan);border-radius:16px;padding:5px 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <div class="wordmark">
+    <svg class="hex-logo" width="34" height="34" viewBox="0 0 100 100">
+      <polygon points="50,4 91,26 91,74 50,96 9,74 9,26" fill="none" stroke="#00ff88" stroke-width="4"/>
+      <line x1="50" y1="12" x2="50" y2="88" stroke="#00d4ff" stroke-width="1.5" opacity="0.55"/>
+      <line x1="16" y1="50" x2="84" y2="50" stroke="#00d4ff" stroke-width="1.5" opacity="0.55"/>
+      <ellipse cx="50" cy="37" rx="15" ry="6.5" fill="none" stroke="#d4a843" stroke-width="2.5"/>
+      <path d="M35 37 v20 a15 6.5 0 0 0 30 0 v-20" fill="none" stroke="#d4a843" stroke-width="2.5"/>
+    </svg>
+    <div>
+      <h1>Lorapok Querycraft</h1>
+      <span>Tactician's Logbook â€” UI Design Pass</span>
+    </div>
+  </div>
+  <p>Eight core mobile screens showing the app's visual language in context: saved connections, add-connection form, data grid CRUD, the query playground with live autocomplete, the key-gated AI assistant, multi-provider AI settings, general app settings (fetch limits + schema visibility), and the about screen. Scroll the rail horizontally on desktop, or swipe on mobile.</p>
+  <div class="legend">
+    <div class="chip"><span class="dot" style="background:#030711;border:1px solid #333"></span>Base #030711</div>
+    <div class="chip"><span class="dot" style="background:#00ff88"></span>Neon green â€” primary / READ</div>
+    <div class="chip"><span class="dot" style="background:#00d4ff"></span>Electric cyan â€” schema / data</div>
+    <div class="chip"><span class="dot" style="background:#d4a843"></span>Gold â€” AI / WRITE risk</div>
+    <div class="chip"><span class="dot" style="background:#ff4d6d"></span>Danger â€” DESTRUCTIVE</div>
+    <div class="chip">Playfair Display SC Â· Space Mono Â· Lora</div>
+  </div>
+</div>
+
+<div class="rail">
+
+  <!-- SCREEN 1: CONNECTIONS -->
+  <div class="frame-block">
+    <div class="frame-label">01 â€” Connections</div>
+    <div class="phone"><div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>â—â—â—â— 5G</span></div>
+        <div class="app-header">
+          <div class="brand">
+            <svg class="hex-logo" viewBox="0 0 100 100"><polygon points="50,4 91,26 91,74 50,96 9,74 9,26" fill="none" stroke="#00ff88" stroke-width="5"/><ellipse cx="50" cy="37" rx="15" ry="6.5" fill="none" stroke="#d4a843" stroke-width="3"/><path d="M35 37 v20 a15 6.5 0 0 0 30 0 v-20" fill="none" stroke="#d4a843" stroke-width="3"/></svg>
+            <h2>Querycraft</h2>
+          </div>
+          <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted-2)">âš™</span>
+        </div>
+        <div class="body-scroll">
+          <div class="section-eyebrow">Saved Connections</div>
+
+          <div class="conn-card">
+            <div class="top">
+              <span class="color-tag" style="background:var(--danger)"></span>
+              <span class="alias">Shohoz Live â€” Production</span>
+            </div>
+            <div class="host">mysql://prod-db.internal:3306</div>
+            <div style="margin-top:8px;"><span class="pill connected">Connected</span><span class="pill ssh">SSH tunnel</span></div>
+          </div>
+
+          <div class="conn-card">
+            <div class="top">
+              <span class="color-tag" style="background:var(--cyan)"></span>
+              <span class="alias">Shohoz Bus â€” Beta</span>
+            </div>
+            <div class="host">localhost:3306 / shohoz_beta</div>
+            <div style="margin-top:8px;"><span class="pill" style="background:rgba(124,135,152,0.15);color:var(--muted);border:1px solid var(--line)">Idle</span></div>
+          </div>
+
+          <div class="conn-card">
+            <div class="top">
+              <span class="color-tag" style="background:var(--gold)"></span>
+              <span class="alias">LaraCommerce Dev</span>
+            </div>
+            <div class="host">127.0.0.1:3306 / laracommerce</div>
+            <div style="margin-top:8px;"><span class="pill" style="background:rgba(124,135,152,0.15);color:var(--muted);border:1px solid var(--line)">Idle</span></div>
+          </div>
+
+          <div class="section-eyebrow">Recent Schemas</div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);line-height:2;">
+ orders Â· customers Â· shohozlive_tickets Â· inventory
+          </div>
+        </div>
+        <div class="fab"><span>+</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: ADD NEW CONNECTION -->
+  <div class="frame-block">
+    <div class="frame-label">02 â€” Add New Connection</div>
+    <div class="phone"><div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>â—â—â—â— 5G</span></div>
+        <div class="app-header">
+          <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)">Cancel</span>
+          <h2>New Connection</h2>
+          <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--green);font-weight:700">Save</span>
+        </div>
+        <div class="body-scroll">
+          <div class="field-label">Alias</div>
+          <div class="field-input placeholder">e.g. Production â€” Orders DB</div>
+
+          <div class="field-label">Color tag</div>
+          <div class="swatch-row">
+            <div class="swatch sel" style="background:var(--danger)"></div>
+            <div class="swatch" style="background:var(--gold)"></div>
+            <div class="swatch" style="background:var(--cyan)"></div>
+            <div class="swatch" style="background:var(--green)"></div>
+            <div class="swatch" style="background:var(--muted)"></div>
+          </div>
+
+          <div class="field-label">Connection Type</div>
+          <div class="segmented">
+            <div class="active">Default</div><div>Unix Socket</div><div>URL only</div>
+          </div>
+
+          <div class="field-label">Host</div>
+          <div class="field-input">prod-db.internal</div>
+
+          <div class="field-label">Port</div>
+          <div class="field-input">3306</div>
+
+          <div class="field-label">User</div>
+          <div class="field-input placeholder">db_user</div>
+
+          <div class="field-label">Password</div>
+          <div class="field-input placeholder">â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢</div>
+          <div class="save-policy">
+            <div class="policy-pill active">Forever</div>
+            <div class="policy-pill">Session only</div>
+            <div class="policy-pill">Never</div>
+          </div>
+
+          <div class="field-label">Default Database</div>
+          <div class="field-input placeholder">Select schema â–¾</div>
+
+          <div class="expand-row"><span>SSH Tunnel</span><span>â–¸</span></div>
+          <div class="expand-row"><span>Advanced Parameters</span><span>â–¸</span></div>
+          <div class="expand-row"><span style="color:var(--cyan)">Require SSL/TLS</span><span style="color:var(--green)">â—  ON</span></div>
+
+          <div class="form-actions">
+            <div class="btn" style="flex:1;">Test Connection</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: DATA GRID -->
+  <div class="frame-block">
+    <div class="frame-label">03 â€” Data Grid & CRUD</div>
+    <div class="phone"><div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>â—â—â—â— 5G</span></div>
+        <div class="app-header">
+          <div class="brand"><h2 style="color:var(--cyan)">orders</h2></div>
+          <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted)">1,204 rows</span>
+        </div>
+        <div class="body-scroll">
+          <div class="table-tabs">
+            <div class="tab active">orders</div>
+            <div class="tab">customers</div>
+            <div class="tab">inventory</div>
+            <div class="tab">payments</div>
+          </div>
+          <div class="filter-bar">
+            <div class="filter-chip">status = pending Ã—</div>
+            <div class="filter-chip">created_at &gt; 2026-07-01 Ã—</div>
+          </div>
+          <div class="grid">
+            <div class="grid-row head"><div>id</div><div>customer</div><div>status</div><div>total</div></div>
+            <div class="grid-row"><div>10231</div><div>M. Rahman</div><div class="status-pending">pending</div><div>$412</div></div>
+            <div class="grid-row"><div>10232</div><div>S. Chowdhury</div><div class="status-paid">paid</div><div>$88</div></div>
+            <div class="grid-row"><div>10233</div><div>A. Hasan</div><div class="status-pending">pending</div><div>$1,240</div></div>
+            <div class="grid-row"><div>10234</div><div>T. Islam</div><div class="status-paid">paid</div><div>$56</div></div>
+            <div class="grid-row"><div>10235</div><div>N. Akter</div><div class="status-pending">pending</div><div>$322</div></div>
+            <div class="grid-row"><div>10236</div><div>R. Karim</div><div class="status-paid">paid</div><div>$710</div></div>
+          </div>
+          <div class="row-actions">
+            <span>âœŽ edit selected</span><span>â¤“ export</span><span style="color:var(--danger)">âœ• delete</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: PLAYGROUND -->
+  <div class="frame-block">
+    <div class="frame-label">04 â€” Query Playground</div>
+    <div class="phone"><div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>â—â—â—â— 5G</span></div>
+        <div class="app-header">
+          <div class="brand"><h2>Playground</h2></div>
+          <span class="ai-toggle">AI: ON</span>
+        </div>
+        <div class="body-scroll">
+          <div class="editor">
+            <div class="code-line"><span class="ln">1</span><span><span class="kw">SELECT</span> o.id, o.status, c.name</span></div>
+            <div class="code-line"><span class="ln">2</span><span><span class="kw">FROM</span> orders o</span></div>
+            <div class="code-line"><span class="ln">3</span><span><span class="kw">JOIN</span> customers c <span class="kw">ON</span> o.customer_id = c.id</span></div>
+            <div class="code-line"><span class="ln">4</span><span><span class="kw">WHERE</span> o.status = <span class="str">'pending'</span></span></div>
+            <div class="code-line"><span class="ln">5</span><span class="ghost">ORDER BY o.created_at DESC;</span></div>
+          </div>
+
+          <div class="suggest-box">
+            <div class="suggest-item sel"><span class="ic">â–¤</span> created_at</div>
+            <div class="suggest-item"><span class="ic">â–¤</span> customer_id</div>
+            <div class="suggest-item"><span class="ic">â–¤</span> status</div>
+            <div class="suggest-item"><span class="ic">âŒ˜</span> COUNT(*)</div>
+          </div>
+
+          <div class="divider-drag"></div>
+          <div class="result-panel">
+            <div class="meta" style="display:flex;justify-content:space-between;">
+              <span>42 rows Â· 0.014s</span>
+              <span style="color:var(--cyan)">â¤“ Export â–¾</span>
+            </div>
+            <div class="grid" style="border:none;">
+              <div class="grid-row head" style="grid-template-columns:0.6fr 1fr 1.4fr;"><div>id</div><div>status</div><div>name</div></div>
+              <div class="grid-row" style="grid-template-columns:0.6fr 1fr 1.4fr;"><div>10231</div><div class="status-pending">pending</div><div>M. Rahman</div></div>
+              <div class="grid-row" style="grid-template-columns:0.6fr 1fr 1.4fr;"><div>10233</div><div class="status-pending">pending</div><div>A. Hasan</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: AI ASSISTANT -->
+  <div class="frame-block">
+    <div class="frame-label">05 â€” Ask-DB (AI Assistant)</div>
+    <div class="phone"><div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>â—â—â—â— 5G</span></div>
+        <div class="app-header">
+          <div class="brand"><h2>Ask DB</h2></div>
+          <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--gold)">Claude Â· Sonnet</span>
+        </div>
+        <div class="body-scroll" style="padding-bottom:110px;display:flex;flex-direction:column;">
+          <div class="prompt-bubble">Show me all pending orders over $300 with the customer's name</div>
+
+          <div class="ai-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span class="risk-badge risk-read">READ</span>
+              <span style="font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted)">orders, customers</span>
+            </div>
+            <div class="sql">SELECT o.id, o.total, c.name<br>FROM orders o<br>JOIN customers c ON o.customer_id = c.id<br>WHERE o.status = 'pending' AND o.total &gt; 300;</div>
+            <div class="explain">Joins orders to customers on customer_id, filtering to pending orders over $300. No index found on (status, total) â€” consider adding one if this runs often.</div>
+            <div class="btn-row">
+              <div class="btn">Edit</div>
+              <div class="btn confirm">Run query</div>
+            </div>
+            <div style="text-align:center;margin-top:8px;font-family:'Space Mono',monospace;font-size:10px;color:var(--cyan)">â¤“ Export result after run</div>
+          </div>
+        </div>
+        <div class="ask-input">
+          <span input-fake>Ask about your databaseâ€¦</span>
+          <svg class="hex-send" viewBox="0 0 100 100"><polygon points="50,4 91,26 91,74 50,96 9,74 9,26" fill="#00ff88"/><path d="M35 45 L65 50 L35 55 Z" fill="#02140b"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: AI PROVIDERS SETTINGS -->
+  <div class="frame-block">
+    <div class="frame-label">06 â€” Settings Â· AI Providers</div>
+    <div class="phone"><div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>â—â—â—â— 5G</span></div>
+        <div class="app-header">
+          <div class="brand"><h2>AI Providers</h2></div>
+        </div>
+        <div class="body-scroll">
+          <div class="banner">No key required to use Querycraft. Add any provider key below to automatically unlock Ask-DB, ghost-text, and Explain/Optimize.</div>
+
+          <div class="provider-row">
+            <div class="top"><span class="provider-name">Anthropic</span><div class="toggle on"><div class="knob"></div></div></div>
+            <div class="key-field">sk-ant-â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢7f2a</div>
+            <div class="actions"><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted)">claude-sonnet-4-6 â–¾</span><span class="test-btn">Test & Save</span></div>
+          </div>
+
+          <div class="provider-row">
+            <div class="top"><span class="provider-name">OpenAI</span><div class="toggle off"><div class="knob"></div></div></div>
+            <div class="key-field" style="color:var(--muted-2)">Add API keyâ€¦</div>
+            <div class="actions"><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted-2)">gpt-4.1 â–¾</span><span class="test-btn">Test & Save</span></div>
+          </div>
+
+          <div class="provider-row">
+            <div class="top"><span class="provider-name">Google Gemini</span><div class="toggle off"><div class="knob"></div></div></div>
+            <div class="key-field" style="color:var(--muted-2)">Add API keyâ€¦</div>
+            <div class="actions"><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted-2)">gemini-2.5-pro â–¾</span><span class="test-btn">Test & Save</span></div>
+          </div>
+
+          <div class="provider-row">
+            <div class="top"><span class="provider-name">Groq</span><div class="toggle off"><div class="knob"></div></div></div>
+            <div class="key-field" style="color:var(--muted-2)">Add API keyâ€¦</div>
+            <div class="actions"><span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted-2)">llama-3.3-70b â–¾</span><span class="test-btn">Test & Save</span></div>
+          </div>
+
+          <div class="section-eyebrow">Default provider</div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--cyan);">â— Anthropic â€” used unless overridden per request</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- SCREEN: GENERAL SETTINGS -->
+  <div class="frame-block">
+    <div class="frame-label">07 â€” Settings Â· General & Data</div>
+    <div class="phone"><div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>â—â—â—â— 5G</span></div>
+        <div class="app-header">
+          <div class="brand"><h2>Settings</h2></div>
+        </div>
+        <div class="body-scroll">
+
+          <div class="section-eyebrow">Data Fetching</div>
+          <div class="settings-group">
+            <div class="setting-row">
+              <div><div class="label">Initial row limit</div><div class="sub">rows loaded on first table open</div></div>
+              <div class="stepper"><span class="btn-step">â€“</span> 100 <span class="btn-step">+</span></div>
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Page size</div><div class="sub">rows per scroll page</div></div>
+              <div class="stepper"><span class="btn-step">â€“</span> 50 <span class="btn-step">+</span></div>
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Query timeout</div><div class="sub">seconds before auto-cancel</div></div>
+              <div class="stepper"><span class="btn-step">â€“</span> 30s <span class="btn-step">+</span></div>
+            </div>
+          </div>
+
+          <div class="section-eyebrow">Visible Databases â€” Shohoz Live</div>
+          <div class="select-all-row"><span>Select All</span><span>Clear</span></div>
+          <div class="settings-group">
+            <div class="db-check-row"><div class="checkbox checked"></div><div class="name">orders</div><div class="count">18 tables</div></div>
+            <div class="db-check-row"><div class="checkbox checked"></div><div class="name">customers</div><div class="count">6 tables</div></div>
+            <div class="db-check-row"><div class="checkbox checked"></div><div class="name">inventory</div><div class="count">11 tables</div></div>
+            <div class="db-check-row"><div class="checkbox"></div><div class="name">analytics_archive</div><div class="count">42 tables</div></div>
+            <div class="db-check-row"><div class="checkbox"></div><div class="name">information_schema</div><div class="count">system</div></div>
+          </div>
+
+          <div class="section-eyebrow">Export Defaults</div>
+          <div class="settings-group">
+            <div class="setting-row">
+              <div><div class="label">Default format</div><div class="sub">used for the quick-export button</div></div>
+              <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--cyan)">CSV â–¾</div>
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Include column headers</div></div>
+              <div class="toggle on"><div class="knob"></div></div>
+            </div>
+          </div>
+
+          <div class="section-eyebrow">Security</div>
+          <div class="settings-group">
+            <div class="setting-row">
+              <div><div class="label">Biometric lock</div><div class="sub">required after backgrounding</div></div>
+              <div class="toggle on"><div class="knob"></div></div>
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Auto-lock timeout</div></div>
+              <div class="stepper"><span class="btn-step">â€“</span> 5m <span class="btn-step">+</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: ABOUT -->
+  <div class="frame-block">
+    <div class="frame-label">08 â€” About</div>
+    <div class="phone"><div class="notch"></div>
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>â—â—â—â— 5G</span></div>
+        <div class="app-header">
+          <div class="brand"><h2>About</h2></div>
+        </div>
+        <div class="body-scroll">
+          <div class="about-hero">
+            <svg class="hex-big" viewBox="0 0 100 100">
+              <polygon points="50,4 91,26 91,74 50,96 9,74 9,26" fill="none" stroke="#00ff88" stroke-width="4"/>
+              <line x1="50" y1="12" x2="50" y2="88" stroke="#00d4ff" stroke-width="1.5" opacity="0.55"/>
+              <line x1="16" y1="50" x2="84" y2="50" stroke="#00d4ff" stroke-width="1.5" opacity="0.55"/>
+              <ellipse cx="50" cy="37" rx="15" ry="6.5" fill="none" stroke="#d4a843" stroke-width="2.5"/>
+              <path d="M35 37 v20 a15 6.5 0 0 0 30 0 v-20" fill="none" stroke="#d4a843" stroke-width="2.5"/>
+            </svg>
+            <h3>Lorapok Querycraft</h3>
+            <div class="ver">v1.0.0 (build 2026.07.14)</div>
+          </div>
+
+          <div class="about-block">
+            <div class="k">Developed by</div>
+            <div class="v">Lorapok Labs â€” an open-source software collective based in Dhaka, Bangladesh.</div>
+            <div class="about-links">
+              <div class="link-chip">github.com/lorapok</div>
+              <div class="link-chip">lorapok.github.io</div>
+            </div>
+          </div>
+
+          <div class="about-block">
+            <div class="k">Founder</div>
+            <div class="v">Lorapok (@Maijied)</div>
+          </div>
+
+          <div class="about-block">
+            <div class="k">Features</div>
+            <div class="feature-list">
+              <div><span class="on">âœ“</span> Full CRUD & visual filtering</div>
+              <div><span class="on">âœ“</span> CSV / JSON / SQL export, everywhere</div>
+              <div><span class="on">âœ“</span> Encrypted, session-based connections</div>
+              <div><span class="on">âœ“</span> Schema-aware autocomplete</div>
+              <div><span class="on">âœ“</span> Multi-provider AI, key-gated</div>
+              <div><span class="on">âœ“</span> Biometric session lock</div>
+            </div>
+          </div>
+
+          <div class="about-block">
+            <div class="k">Open Source</div>
+            <div class="v">Published under the Lorapok Labs brand. Licensed for free use and contribution â€” see repository for license terms.</div>
+          </div>
+
+          <div style="text-align:center;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted-2);margin-top:6px;">
+            Â© 2026 Lorapok Labs. All rights reserved.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
